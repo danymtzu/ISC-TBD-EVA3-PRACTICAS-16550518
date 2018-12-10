@@ -1,0 +1,123 @@
+MySQL Shell 8.0.12
+
+Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type '\help' or '\?' for help; '\quit' to exit.
+
+
+ MySQL  JS > \sql
+Switching to SQL mode... Commands end with ;
+
+ MySQL  SQL > \connect -c root@localhost
+The -c option is deprecated, please use --mysql or -mc instead
+Creating a Classic session to 'root@localhost'
+Please provide the password for 'root@localhost': ****
+Save password for 'root@localhost:3306'? [Y]es/[N]o/Ne[v]er (default No): y
+Fetching schema names for autocompletion... Press ^C to stop.
+Your MySQL connection id is 60
+Server version: 8.0.12 MySQL Community Server - GPL
+No default schema selected; type \use <schema> to set one.
+
+ MySQL  localhost:3306 ssl  SQL > \use evaluacion_3
+Default schema set to `evaluacion_3`.
+Fetching table and column names from `evaluacion_3` for auto-completion... Press ^C to stop.
+
+ MySQL  localhost:3306 ssl  evaluacion_3  SQL > select sumatoria(5);
++--------------+
+| sumatoria(5) |
++--------------+
+|           15 |
++--------------+
+1 row in set (0.0013 sec)
+
+ MySQL  localhost:3306 ssl  evaluacion_3  SQL > select sumatoria(50);
++---------------+
+| sumatoria(50) |
++---------------+
+|          1275 |
++---------------+
+1 row in set (0.0008 sec)
+
+ MySQL  localhost:3306 ssl  evaluacion_3  SQL > create table temp(
+                                            ... nombre varachar(50));
+ERROR: 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'varachar(50))' at line 2
+
+ MySQL  localhost:3306 ssl  evaluacion_3  SQL > create table temp( nombre varchar(50));
+Query OK, 0 rows affected (0.1051 sec)
+
+ MySQL  localhost:3306 ssl  evaluacion_3  SQL > insert into temp values(('HOLA'),('MUNDO'), ('CRUEL'));
+ERROR: 1136 (21S01): Column count doesn't match value count at row 1
+
+ MySQL  localhost:3306 ssl  evaluacion_3  SQL > insert into temp values('HOLA'),('MUNDO'), ('CRUEL');
+Query OK, 3 rows affected (0.0341 sec)
+
+Records: 3  Duplicates: 0  Warnings: 0
+
+ MySQL  localhost:3306 ssl  evaluacion_3  SQL > \use northwind;
+MySQL Error 1049 (42000): ClassicSession.runSql: Unknown database 'northwind;'
+
+ MySQL  localhost:3306 ssl  evaluacion_3  SQL > \use northwind
+Default schema set to `northwind`.
+Fetching table and column names from `northwind` for auto-completion... Press ^C to stop.
+
+ MySQL  localhost:3306 ssl  northwind  SQL > select * from customers limit 10;
++------------+------------------------------------+----------------------+----------------------+--------------------------------+--------------+--------+------------+---------+----------------+----------------+
+| CustomerID | CompanyName                        | ContactName          | ContactTitle         | Address                        | City         | Region | PostalCode | Country | Phone          | Fax            |
++------------+------------------------------------+----------------------+----------------------+--------------------------------+--------------+--------+------------+---------+----------------+----------------+
+| ALFKI      | Alfreds Futterkiste                | Maria Anders         | Sales Representative | Obere Str. 57                  | Berlin       | NULL   | 12209      | Germany | 030-0074321    | 030-0076545    |
+| ANATR      | Ana Trujillo Emparedados y helados | Ana Trujillo         | Owner                | Avda. de la Constituci MySQL  localhost:3306 ssl  northwind  SQL >
+
+
+CREATE FUNCTION `cuenta_ordenes` (customer_id varchar(5))
+
+RETURNS INTEGER
+
+BEGIN
+	
+	declare cont int;
+    
+	select count(*) into cont
+    
+	from orders
+    
+	where customerid= customer_id;
+
+RETURN cont;
+
+END
+
+select customerid, companyname, cuenta_ordenes(customerid) as no_orders from customers;
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `sumatoria`(num int) RETURNS int(11)
+
+BEGIN
+	
+	declare sumatoria int;
+    
+	set sumatoria=0;
+    
+    
+	suma_loop: loop
+		
+		if num > 0 then
+			
+		set sumatoria= sumatoria+num;
+            
+		set num= num - 1;
+            
+		iterate suma_loop;
+        
+		end if;
+        
+	leave suma_loop;
+    
+	end loop suma_loop;
+    
+
+RETURN sumatoria;
+
+END

@@ -1,0 +1,59 @@
+CREATE DEFINER=`root`@`localhost` FUNCTION `contar_clientes_cursor`() RETURNS int(11)
+
+BEGIN
+declare conteo int;
+	
+declare customer_id text;
+    
+#VARIABLE BOOLEANA DE CONTROL
+    
+declare fin_cursor int default false;#Cuando lleguemos al final, será verdad
+    
+#VARIABLE CURSOR(SELECT)
+    
+declare cursor_clientes cursor for
+    
+select CustomerID from Customers;
+    
+#MANEJADOR(HADNLER) PARA LA VARIABLE DE BOOLEANA
+    
+declare continue handler for not found
+    
+set fin_cursor=true;
+        
+	
+set conteo=0;
+
+#USAR CURSOR
+    
+open cursor_clientes;
+    
+#USAMOS UN CICLO PARA RECORRERLO
+    
+ciclo_cursor:loop
+		
+#equvale al iterate
+		
+fetch cursor_clientes into customer_id;
+		
+#al llegar al final se produce una excepcion
+        
+if fin_cursor then
+			
+leave ciclo_cursor;
+        
+else
+			
+insert into  temp_customer values(customer_id);
+			
+set conteo= conteo+1;
+    end if;
+    end loop;
+    
+    
+close cursor_clientes;
+    
+
+RETURN conteo;
+
+END

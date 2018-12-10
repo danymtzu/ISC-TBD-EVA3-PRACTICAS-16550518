@@ -1,0 +1,53 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `conteo_clientes_filtro`(in letra text, out cont int)
+
+BEGIN
+	
+select count(*) 
+    
+into cont 
+    
+from customers
+    
+where companyname like concat(letra,'%');
+
+END
+
+set @cont = 0;
+call northwind.conteo_clientes_filtro('a', @cont);
+select @cont;
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `conteo_clientes`(out cont 
+BEGIN
+	
+select count(*) 
+    
+into cont 
+    
+from customers;
+
+END
+
+set @cont = 0;
+call northwind.conteo_clientes(@cont);
+select @cont;
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `add_region`(in name_region text)
+
+BEGIN
+	
+declare clave int;
+	
+select max(regionid) 
+into clave
+    
+from region;
+    
+   
+ set clave= clave+1;
+    
+    
+insert into region values(clave, name_region);
+
+END
+call northwind.add_region('En un lugar de la mancha');
